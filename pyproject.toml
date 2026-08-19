@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rivulet-dispatch"
+version = "0.1.0"
+description = "Deterministic-first multi-agent dispatcher: mentions, rules, one-specialist lock, loop guards."
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.11"
+authors = [{ name = "Justin Wilson" }]
+keywords = ["agents", "dispatcher", "routing", "multi-agent"]
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=8,<9", "pytest-asyncio>=0.23"]
+
+[project.scripts]
+rivulet-dispatch = "rivulet_dispatch.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/jwilson411/rivulet-dispatch"
+Source = "https://github.com/jwilson411/rivulet-dispatch"
+Related = "https://github.com/jwilson411/Rivulets"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+asyncio_mode = "auto"
