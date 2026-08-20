@@ -75,6 +75,21 @@ asyncio.run(main())
 
 A human just spoke. The lock sends it to Assistant even though DBA's keyword also matched. Assistant hands off. Keyword rematch does not pile the rest of the roster on.
 
+No event loop handy? `dispatch_sync` wraps the same engine for CLI scripts and notebooks (not for code already inside a running loop):
+
+```python
+from rivulet_dispatch import AgentDispatchInfo, DispatchMethod, Rule, RuleType, dispatch_sync
+print(dispatch_sync("postgresql schema", [AgentDispatchInfo("dba-1", "DBA", [Rule(RuleType.KEYWORD, ["postgresql"])])]).method)
+```
+
+As a shell one-liner:
+
+```bash
+python -c 'from rivulet_dispatch import AgentDispatchInfo, DispatchMethod, Rule, RuleType, dispatch_sync; print(dispatch_sync("postgresql schema", [AgentDispatchInfo("dba-1", "DBA", [Rule(RuleType.KEYWORD, ["postgresql"])])]).method)'
+```
+
+Prints `deterministic`.
+
 ## CLI
 
 ```bash

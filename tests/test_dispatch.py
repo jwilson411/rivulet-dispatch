@@ -5,6 +5,7 @@ from rivulet_dispatch.engine import (
     DispatchEngine,
     DispatchMethod,
     LlmFallbackResult,
+    dispatch_sync,
 )
 from rivulet_dispatch.rules import Rule, RuleType
 
@@ -180,3 +181,42 @@ async def test_mention_can_still_retarget_the_speaker() -> None:
     result = await engine.dispatch("cc @Assistant", [assistant], speaker_id="asst-1")
     assert result.method is DispatchMethod.MENTION
     assert result.agent_ids == ["asst-1"]
+
+
+def test_dispatch_sync_keyword_match_matches_async_path() -> None:
+    result = dispatch_sync(
+        "I need help designing a PostgreSQL schema for user profiles.",
+        [_dba_agent()],
+    )
+    assert result.method is DispatchMethod.DETERMINISTIC
+    assert result.agent_ids == ["dba-1"]
+
+
+def test_dispatch_sync_no_match_with_no_fallback_is_none() -> None:
+    result = dispatch_sync("What's the weather like today?", [_dba_agent()])
+    assert result.method is DispatchMethod.NONE
+    assert result.agent_ids == []
+
+
+def test_dispatch_sync_speaker_is_excluded_from_unsolicited_redispatch() -> None:
+    assistant = AgentDispatchInfo(
+        agent_id="asst-1", name="Assistant", rules=[Rule(RuleType.ALWAYS)]
+    )
+    result = dispatch_sync(
+        "Of course! What task do you need assistance with?",
+        [assistant],
+        speaker_id="asst-1",
+    )
+    assert result.method is DispatchMethod.NONE
+    assert result.agent_ids == []
+
+
+def test_dispatch_sync_drives_async_llm_fallback() -> None:
+    async def fake_llm(message: str, agents: list[AgentDispatchInfo]) -> LlmFallbackResult:
+        return LlmFallbackResult(agent_ids=[a.agent_id for a in agents], invoked=True)
+
+    agent = AgentDispatchInfo(agent_id="ds-1", name="DataScientist", rules=[])
+    result = dispatch_sync("anything at all", [agent], llm_fallback=fake_llm)
+    assert result.method is DispatchMethod.LLM
+    assert result.agent_ids == ["ds-1"]
+    assert result.llm_invoked is True

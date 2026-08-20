@@ -4,6 +4,7 @@ from rivulet_dispatch.engine import (
     DispatchMethod,
     DispatchResult,
     LlmFallbackResult,
+    dispatch_sync,
 )
 from rivulet_dispatch.guards import LoopGuard, Pause
 from rivulet_dispatch.orchestration import apply_orchestrator_lock
@@ -26,6 +27,7 @@ __all__ = [
     "Rule",
     "RuleType",
     "apply_orchestrator_lock",
+    "dispatch_sync",
     "is_overly_broad_regex",
     "is_valid_regex",
     "rule_matches",
