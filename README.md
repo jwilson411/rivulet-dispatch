@@ -104,6 +104,8 @@ rivulet-dispatch \
 
 `--orchestrator Assistant` applies the one-specialist lock. `--speaker-id dba-1` is a re-dispatch of that agent's own reply.
 
+The repo also ships `examples/team-no-assistant.json` (no always/Assistant agent) and `examples/team-mention-only.json` (a mention-only roster) for trying out unmatched and mention-only dispatch.
+
 ## Guards
 
 In-memory turn cap, cycle detection, and timeout. A human message resets the counters.
