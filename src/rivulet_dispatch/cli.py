@@ -3,15 +3,14 @@
 from __future__ import annotations
 
 import argparse
-import asyncio
 import json
 import sys
 from pathlib import Path
 
 from rivulet_dispatch.engine import (
     AgentDispatchInfo,
-    DispatchEngine,
     DispatchResult,
+    dispatch_sync,
 )
 from rivulet_dispatch.orchestration import apply_orchestrator_lock
 from rivulet_dispatch.rules import Rule, RuleType
@@ -50,10 +49,9 @@ def _result_to_json(result: DispatchResult) -> str:
     )
 
 
-async def _run(args: argparse.Namespace) -> int:
+def _run(args: argparse.Namespace) -> int:
     agents = _load_team(Path(args.team))
-    engine = DispatchEngine()
-    result = await engine.dispatch(args.message, agents, speaker_id=args.speaker_id)
+    result = dispatch_sync(args.message, agents, speaker_id=args.speaker_id)
     if args.orchestrator:
         orch = next((a for a in agents if a.name.lower() == args.orchestrator.lower()), None)
         result = apply_orchestrator_lock(
@@ -76,7 +74,7 @@ def main(argv: list[str] | None = None) -> int:
         help="Apply the one-specialist lock using this agent name (usually Assistant)",
     )
     args = parser.parse_args(argv)
-    return asyncio.run(_run(args))
+    return _run(args)
 
 
 if __name__ == "__main__":

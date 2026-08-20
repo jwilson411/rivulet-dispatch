@@ -15,6 +15,7 @@ bounce on every teammate reply.
 
 from __future__ import annotations
 
+import asyncio
 import re
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass, field
@@ -159,3 +160,15 @@ class DispatchEngine:
             method=method,
             llm_invoked=fallback_result.invoked,
         )
+
+
+def dispatch_sync(
+    message: str,
+    agents: list[AgentDispatchInfo],
+    *,
+    speaker_id: str | None = None,
+    llm_fallback: LlmFallback | None = None,
+) -> DispatchResult:
+    """Run dispatch() for CLI / notebooks. Not for an already-running event loop."""
+    engine = DispatchEngine(llm_fallback=llm_fallback)
+    return asyncio.run(engine.dispatch(message, agents, speaker_id=speaker_id))
