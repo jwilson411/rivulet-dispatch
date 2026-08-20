@@ -77,6 +77,58 @@ async def test_always_rule_matches_every_message() -> None:
 
 
 @pytest.mark.asyncio
+async def test_two_keyword_rules_higher_priority_wins() -> None:
+    engine = DispatchEngine()
+    agent = AgentDispatchInfo(
+        agent_id="dba-2",
+        name="SchemaExpert",
+        rules=[
+            Rule(RuleType.KEYWORD, ["schema"], priority=20),
+            Rule(RuleType.KEYWORD, ["postgresql"], priority=5),
+        ],
+    )
+    result = await engine.dispatch("postgresql schema design", [agent])
+    assert result.method is DispatchMethod.DETERMINISTIC
+    assert result.agent_ids == ["dba-2"]
+
+
+@pytest.mark.asyncio
+async def test_two_agents_only_one_match_recorded_per_agent() -> None:
+    engine = DispatchEngine()
+    agent_a = AgentDispatchInfo(
+        agent_id="a-1",
+        name="AgentA",
+        rules=[
+            Rule(RuleType.KEYWORD, ["sql"], priority=10),
+            Rule(RuleType.KEYWORD, ["schema"], priority=1),
+        ],
+    )
+    agent_b = AgentDispatchInfo(
+        agent_id="b-1",
+        name="AgentB",
+        rules=[
+            Rule(RuleType.KEYWORD, ["postgres"], priority=9),
+            Rule(RuleType.KEYWORD, ["index"], priority=2),
+        ],
+    )
+    result = await engine.dispatch(
+        "the postgres index needs a sql schema review", [agent_a, agent_b]
+    )
+    assert result.method is DispatchMethod.DETERMINISTIC
+    assert result.agent_ids == ["a-1", "b-1"]
+
+
+@pytest.mark.asyncio
+async def test_multi_mention_dba_and_silent() -> None:
+    engine = DispatchEngine()
+    result = await engine.dispatch(
+        "@DBA @Silent please both look at this", [_dba_agent(), _mention_only_agent()]
+    )
+    assert result.method is DispatchMethod.MENTION
+    assert result.agent_ids == ["dba-1", "silent-1"]
+
+
+@pytest.mark.asyncio
 async def test_llm_fallback_used_when_no_deterministic_match() -> None:
     async def fake_llm(message: str, agents: list[AgentDispatchInfo]) -> LlmFallbackResult:
         return LlmFallbackResult(
