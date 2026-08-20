@@ -3,7 +3,10 @@ from pathlib import Path
 
 from rivulet_dispatch.cli import main
 
-TEAM = Path(__file__).resolve().parents[1] / "examples" / "team.json"
+ROOT = Path(__file__).resolve().parents[1]
+TEAM = ROOT / "examples" / "team.json"
+TEAM_NO_ASSISTANT = ROOT / "examples" / "team-no-assistant.json"
+TEAM_MENTION_ONLY = ROOT / "examples" / "team-mention-only.json"
 
 
 def test_cli_keyword_match(capsys) -> None:
@@ -39,3 +42,39 @@ def test_cli_mention_only(capsys) -> None:
     payload = json.loads(capsys.readouterr().out)
     assert payload["method"] == "mention"
     assert payload["agent_ids"] == ["silent-1"]
+
+
+def test_cli_no_assistant_keyword(capsys) -> None:
+    rc = main(
+        ["--message", "need a postgresql schema", "--team", str(TEAM_NO_ASSISTANT)]
+    )
+    assert rc == 0
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["method"] == "deterministic"
+    assert payload["agent_ids"] == ["dba-1"]
+
+
+def test_cli_no_assistant_unmatched(capsys) -> None:
+    rc = main(["--message", "hello there", "--team", str(TEAM_NO_ASSISTANT)])
+    assert rc == 0
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["method"] == "none"
+    assert payload["agent_ids"] == []
+
+
+def test_cli_mention_only_roster_mention(capsys) -> None:
+    rc = main(["--message", "hey @Archivist", "--team", str(TEAM_MENTION_ONLY)])
+    assert rc == 0
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["method"] == "mention"
+    assert payload["agent_ids"] == ["arch-1"]
+
+
+def test_cli_mention_only_roster_unmatched(capsys) -> None:
+    rc = main(
+        ["--message", "need a postgresql schema", "--team", str(TEAM_MENTION_ONLY)]
+    )
+    assert rc == 0
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["method"] == "none"
+    assert payload["agent_ids"] == []

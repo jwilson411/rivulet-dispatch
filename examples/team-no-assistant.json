@@ -1,0 +1,17 @@
+[
+  {
+    "id": "dba-1",
+    "name": "DBA",
+    "description": "Schemas, SQL, PostgreSQL.",
+    "rules": [
+      {"rule_type": "keyword", "pattern": ["postgresql", "schema", "sql"], "priority": 10},
+      {"rule_type": "regex", "pattern": "(?i)\\bpostgres\\b", "priority": 8}
+    ]
+  },
+  {
+    "id": "silent-1",
+    "name": "Silent",
+    "description": "Only speaks when mentioned.",
+    "rules": [{"rule_type": "mention_only", "pattern": "", "priority": 0}]
+  }
+]

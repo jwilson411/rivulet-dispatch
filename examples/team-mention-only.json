@@ -1,0 +1,14 @@
+[
+  {
+    "id": "silent-1",
+    "name": "Silent",
+    "description": "Only speaks when mentioned.",
+    "rules": [{"rule_type": "mention_only", "pattern": "", "priority": 0}]
+  },
+  {
+    "id": "arch-1",
+    "name": "Archivist",
+    "description": "Keeps records. Only speaks when mentioned.",
+    "rules": [{"rule_type": "mention_only", "pattern": "", "priority": 0}]
+  }
+]
