@@ -24,7 +24,7 @@ make test
 ## Dispatch order
 
 1. `@mentions` bypass every rule.
-2. Deterministic rules: keyword, regex, semantic (substring today), `always`.
+2. Deterministic rules: keyword, regex, semantic (substring today), `always`. An invalid regex rule is treated as no-match and does not fail the rest of the roster.
 3. Optional LLM fallback, injected as a callable. If you do not inject one, unmatched messages return `none`.
 4. Optional orchestrator lock: human turns go to `Assistant`. A specialist reply bounces back to Assistant. Assistant's own reply does not rematch. Mentions still win.
 

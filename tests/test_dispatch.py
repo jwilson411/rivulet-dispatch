@@ -235,6 +235,47 @@ async def test_mention_can_still_retarget_the_speaker() -> None:
     assert result.agent_ids == ["asst-1"]
 
 
+_INVALID_REGEX = r"\b(https?://[\w-]+(\.[\w-]+)+(\/[\w- ./?%&=]*)?)"
+
+
+def _broken_regex_agent() -> AgentDispatchInfo:
+    return AgentDispatchInfo(
+        agent_id="broken-1",
+        name="Broken",
+        rules=[Rule(RuleType.REGEX, _INVALID_REGEX, priority=10)],
+    )
+
+
+@pytest.mark.asyncio
+async def test_invalid_regex_agent_does_not_break_dispatch_for_others() -> None:
+    engine = DispatchEngine()
+    good = AgentDispatchInfo(
+        agent_id="dba-1",
+        name="DBA",
+        rules=[Rule(RuleType.KEYWORD, ["postgresql"], priority=10)],
+    )
+    result = await engine.dispatch(
+        "check https://example.com/docs for the postgresql migration guide",
+        [_broken_regex_agent(), good],
+    )
+    assert result.method is DispatchMethod.DETERMINISTIC
+    assert result.agent_ids == ["dba-1"]
+
+
+def test_dispatch_sync_invalid_regex_agent_does_not_break_dispatch_for_others() -> None:
+    good = AgentDispatchInfo(
+        agent_id="dba-1",
+        name="DBA",
+        rules=[Rule(RuleType.KEYWORD, ["postgresql"], priority=10)],
+    )
+    result = dispatch_sync(
+        "check https://example.com/docs for the postgresql migration guide",
+        [_broken_regex_agent(), good],
+    )
+    assert result.method is DispatchMethod.DETERMINISTIC
+    assert result.agent_ids == ["dba-1"]
+
+
 def test_dispatch_sync_keyword_match_matches_async_path() -> None:
     result = dispatch_sync(
         "I need help designing a PostgreSQL schema for user profiles.",
