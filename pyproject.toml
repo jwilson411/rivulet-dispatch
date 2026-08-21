@@ -33,6 +33,9 @@ Related = "https://github.com/jwilson411/Rivulets"
 [tool.setuptools.packages.find]
 where = ["src"]
 
+[tool.setuptools.package-data]
+rivulet_dispatch = ["py.typed"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]
