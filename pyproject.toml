@@ -20,7 +20,7 @@ classifiers = [
 dependencies = []
 
 [project.optional-dependencies]
-dev = ["pytest>=8,<9", "pytest-asyncio>=0.23"]
+dev = ["pytest>=8,<9", "pytest-asyncio>=0.23", "ruff>=0.8,<1"]
 
 [project.scripts]
 rivulet-dispatch = "rivulet_dispatch.cli:main"
@@ -35,6 +35,14 @@ where = ["src"]
 
 [tool.setuptools.package-data]
 rivulet_dispatch = ["py.typed"]
+
+[tool.ruff]
+target-version = "py311"
+src = ["src", "tests"]
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
