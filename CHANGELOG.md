@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Python 3.11 and 3.12 test matrix
 - CONTRIBUTING.md
 - SECURITY.md (GitHub private advisory; library has no network and no secrets)
+- CLI `--pretty` flag that prints indented JSON (default output stays one compact line)
 
 ### Tests
 

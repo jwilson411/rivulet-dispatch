@@ -39,13 +39,14 @@ def _load_team(path: Path) -> list[AgentDispatchInfo]:
     return agents
 
 
-def _result_to_json(result: DispatchResult) -> str:
+def _result_to_json(result: DispatchResult, indent: int | None = None) -> str:
     return json.dumps(
         {
             "agent_ids": result.agent_ids,
             "method": result.method.value,
             "llm_invoked": result.llm_invoked,
-        }
+        },
+        indent=indent,
     )
 
 
@@ -59,7 +60,7 @@ def _run(args: argparse.Namespace) -> int:
             from_agent_id=args.speaker_id,
             orchestrator_id=None if orch is None else orch.agent_id,
         )
-    print(_result_to_json(result))
+    print(_result_to_json(result, indent=2 if args.pretty else None))
     return 0
 
 
@@ -72,6 +73,11 @@ def main(argv: list[str] | None = None) -> int:
         "--orchestrator",
         default=None,
         help="Apply the one-specialist lock using this agent name (usually Assistant)",
+    )
+    parser.add_argument(
+        "--pretty",
+        action="store_true",
+        help="Print indented JSON instead of a single compact line",
     )
     args = parser.parse_args(argv)
     return _run(args)
