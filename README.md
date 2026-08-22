@@ -49,6 +49,24 @@ On an agent-originated re-dispatch, pass `speaker_id`. The speaker cannot match 
 
 `always` is a human-turn rule. It is not a license to bounce on every teammate reply.
 
+## Broad regex probes
+
+`is_overly_broad_regex` is a lint, not a dispatch filter. A regex rule still matches at runtime even if this helper would flag it. Call the helper when you generate or review a pattern.
+
+The check compiles the pattern, then treats it as a catch-all if it matches the empty string or any of these five probes (the same tuple as `_BROAD_REGEX_PROBES` in `rules.py`):
+
+| Probe | Why it is here |
+|---|---|
+| `xqzplm wibble-frob 9f3k` | Nonsense that still has a word-plus-digit pair. Writer's `(?i)(\d{5}-\d{4}\|[a-zA-Z]{2,}\s?\d{1,3})` hits `frob 9`. |
+| `How are you all doing today?` | Ordinary greeting. A specialist that claims this is not a specialist. |
+| `ok thanks` | Short ack. Same problem. |
+| `hello` | Single common word. |
+| `yes` | Single common word. Even shorter. |
+
+`.*` fails the empty-string check before the probes run. `ORD-\d+` and `https?://[^\s]+` pass. An invalid regex returns false; use `is_valid_regex` for that.
+
+If you change the tuple in `rules.py`, change this table.
+
 ## Quick example
 
 ```python
