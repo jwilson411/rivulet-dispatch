@@ -19,6 +19,30 @@ def test_cli_keyword_match(capsys) -> None:
     assert payload["agent_ids"] == ["asst-1", "dba-1"]
 
 
+def test_cli_default_output_is_single_line(capsys) -> None:
+    rc = main(["--message", "need a postgresql schema", "--team", str(TEAM)])
+    assert rc == 0
+    out = capsys.readouterr().out
+    printed = out.rstrip("\n")
+    assert "\n" not in printed
+    payload = json.loads(printed)
+    assert payload["method"] == "deterministic"
+    assert payload["agent_ids"] == ["asst-1", "dba-1"]
+
+
+def test_cli_pretty_output_is_indented(capsys) -> None:
+    rc = main(
+        ["--message", "need a postgresql schema", "--team", str(TEAM), "--pretty"]
+    )
+    assert rc == 0
+    out = capsys.readouterr().out
+    printed = out.rstrip("\n")
+    assert "\n}" in printed
+    payload = json.loads(printed)
+    assert payload["method"] == "deterministic"
+    assert payload["agent_ids"] == ["asst-1", "dba-1"]
+
+
 def test_cli_orchestrator_lock_sends_human_to_assistant(capsys) -> None:
     rc = main(
         [
