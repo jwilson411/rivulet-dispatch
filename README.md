@@ -28,6 +28,23 @@ make test
 3. Optional LLM fallback, injected as a callable. If you do not inject one, unmatched messages return `none`.
 4. Optional orchestrator lock: human turns go to `Assistant`. A specialist reply bounces back to Assistant. Assistant's own reply does not rematch. Mentions still win.
 
+```mermaid
+flowchart TD
+  start[Message and team] --> mention{Any @mention?}
+  mention -->|yes| outMention[method mention]
+  mention -->|no| det{Deterministic rule match?}
+  det -->|yes| outDet[method deterministic]
+  det -->|no| llm{LLM fallback injected?}
+  llm -->|no| outNone[method none]
+  llm -->|yes, pick| outLlm[method llm]
+  llm -->|yes, empty| outNone
+  outMention --> lock[Optional orchestrator lock]
+  outDet --> lock
+  outLlm --> lock
+  outNone --> lock
+  lock --> done[Return result]
+```
+
 On an agent-originated re-dispatch, pass `speaker_id`. The speaker cannot match themselves via `always` / keyword / LLM. Mentions still can.
 
 `always` is a human-turn rule. It is not a license to bounce on every teammate reply.
