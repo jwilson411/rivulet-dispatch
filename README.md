@@ -154,7 +154,7 @@ pause = guard.record_agent_message(from_agent_id="a", to_agent_id="b")
 guard.reset()  # human spoke
 ```
 
-Cycle detection counts repeating `(from, to)` pairs inside the window. Default threshold is 3.
+Cycle detection counts repeating `(from, to)` pairs inside the window. Default threshold is 3. See `examples/loop.py` for a runnable demo that trips the cycle detector.
 
 ## What this is not
 
