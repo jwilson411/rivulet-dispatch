@@ -51,6 +51,22 @@ async def test_no_match_with_no_fallback_is_none() -> None:
 
 
 @pytest.mark.asyncio
+async def test_empty_message_with_keyword_team_is_none() -> None:
+    engine = DispatchEngine()
+    result = await engine.dispatch("", [_dba_agent()])
+    assert result.method is DispatchMethod.NONE
+    assert result.agent_ids == []
+
+
+@pytest.mark.asyncio
+async def test_message_with_empty_team_is_none() -> None:
+    engine = DispatchEngine()
+    result = await engine.dispatch("What's the weather like today?", [])
+    assert result.method is DispatchMethod.NONE
+    assert result.agent_ids == []
+
+
+@pytest.mark.asyncio
 async def test_mention_bypasses_rules_entirely() -> None:
     engine = DispatchEngine()
     result = await engine.dispatch("Hey @DBA what's up?", [_dba_agent()])
