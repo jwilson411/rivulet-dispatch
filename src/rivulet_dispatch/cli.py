@@ -7,6 +7,7 @@ import json
 import sys
 from pathlib import Path
 
+from rivulet_dispatch import __version__
 from rivulet_dispatch.engine import (
     AgentDispatchInfo,
     DispatchResult,
@@ -66,6 +67,11 @@ def _run(args: argparse.Namespace) -> int:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Route a message against a team JSON file.")
+    # action="version" exits before the required-argument check, so
+    # --version works without --message/--team.
+    parser.add_argument(
+        "--version", action="version", version=f"%(prog)s {__version__}"
+    )
     parser.add_argument("--message", required=True, help="Incoming chat message")
     parser.add_argument("--team", required=True, help="Path to team JSON")
     parser.add_argument("--speaker-id", default=None, help="Previous speaker agent id, if any")

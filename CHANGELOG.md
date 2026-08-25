@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CLI `--pretty` flag that prints indented JSON (default output stays one compact line)
 - `examples/loop.py`: runnable demo that trips the LoopGuard cycle detector
 - GitHub issue templates for bugs and feature requests
+- CLI `--version` flag and package `__version__` attribute
 
 ### Tests
 
