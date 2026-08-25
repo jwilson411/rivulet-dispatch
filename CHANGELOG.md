@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - `dispatch_sync` helper for CLI scripts and notebooks
+- CLI exits 2 on a missing team file or invalid JSON (one stderr line, no traceback)
 - Example team fixtures: `team-no-assistant.json` and `team-mention-only.json`
 - Empty `py.typed` marker so type checkers treat the install as typed
 - Ruff lint-only CI job (`ruff check`; no format)
