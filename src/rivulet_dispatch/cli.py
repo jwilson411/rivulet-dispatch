@@ -52,7 +52,14 @@ def _result_to_json(result: DispatchResult, indent: int | None = None) -> str:
 
 
 def _run(args: argparse.Namespace) -> int:
-    agents = _load_team(Path(args.team))
+    try:
+        agents = _load_team(Path(args.team))
+    except FileNotFoundError:
+        print(f"error: team file not found: {args.team}", file=sys.stderr)
+        return 2
+    except json.JSONDecodeError as exc:
+        print(f"error: invalid JSON in team file {args.team}: {exc}", file=sys.stderr)
+        return 2
     result = dispatch_sync(args.message, agents, speaker_id=args.speaker_id)
     if args.orchestrator:
         orch = next((a for a in agents if a.name.lower() == args.orchestrator.lower()), None)

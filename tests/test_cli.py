@@ -103,6 +103,30 @@ def test_cli_mention_only_roster_mention(capsys) -> None:
     assert payload["agent_ids"] == ["arch-1"]
 
 
+def test_cli_missing_team_file(capsys, tmp_path) -> None:
+    rc = main(
+        ["--message", "hello", "--team", str(tmp_path / "does-not-exist.json")]
+    )
+    assert rc == 2
+    captured = capsys.readouterr()
+    lines = [line for line in captured.err.splitlines() if line]
+    assert len(lines) == 1
+    assert "Traceback" not in captured.err
+    assert "Traceback" not in captured.out
+
+
+def test_cli_invalid_team_json(capsys, tmp_path) -> None:
+    bad = tmp_path / "team.json"
+    bad.write_text("{not valid json", encoding="utf-8")
+    rc = main(["--message", "hello", "--team", str(bad)])
+    assert rc == 2
+    captured = capsys.readouterr()
+    lines = [line for line in captured.err.splitlines() if line]
+    assert len(lines) == 1
+    assert "Traceback" not in captured.err
+    assert "Traceback" not in captured.out
+
+
 def test_cli_mention_only_roster_unmatched(capsys) -> None:
     rc = main(
         ["--message", "need a postgresql schema", "--team", str(TEAM_MENTION_ONLY)]
