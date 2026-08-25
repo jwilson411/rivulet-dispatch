@@ -1,12 +1,21 @@
 import json
 from pathlib import Path
 
+import pytest
+
 from rivulet_dispatch.cli import main
 
 ROOT = Path(__file__).resolve().parents[1]
 TEAM = ROOT / "examples" / "team.json"
 TEAM_NO_ASSISTANT = ROOT / "examples" / "team-no-assistant.json"
 TEAM_MENTION_ONLY = ROOT / "examples" / "team-mention-only.json"
+
+
+def test_cli_version_without_required_flags(capsys) -> None:
+    with pytest.raises(SystemExit) as excinfo:
+        main(["--version"])
+    assert excinfo.value.code == 0
+    assert "0.1.0" in capsys.readouterr().out
 
 
 def test_cli_keyword_match(capsys) -> None:

@@ -1,3 +1,5 @@
+__version__ = "0.1.0"
+
 from rivulet_dispatch.engine import (
     AgentDispatchInfo,
     DispatchEngine,
@@ -26,6 +28,7 @@ __all__ = [
     "Pause",
     "Rule",
     "RuleType",
+    "__version__",
     "apply_orchestrator_lock",
     "dispatch_sync",
     "is_overly_broad_regex",
