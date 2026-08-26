@@ -251,6 +251,33 @@ async def test_mention_can_still_retarget_the_speaker() -> None:
     assert result.agent_ids == ["asst-1"]
 
 
+@pytest.mark.asyncio
+async def test_keyword_agent_does_not_rematch_its_own_reply() -> None:
+    engine = DispatchEngine()
+    message = "The postgresql schema migration is ready for review."
+    team = [_dba_agent(), _mention_only_agent()]
+
+    first = await engine.dispatch(message, team)
+    assert first.method is DispatchMethod.DETERMINISTIC
+    assert first.agent_ids == ["dba-1"]
+
+    redispatched = await engine.dispatch(message, team, speaker_id="dba-1")
+    assert redispatched.method is DispatchMethod.NONE
+    assert redispatched.agent_ids == []
+
+
+@pytest.mark.asyncio
+async def test_mention_can_still_retarget_keyword_speaker() -> None:
+    engine = DispatchEngine()
+    result = await engine.dispatch(
+        "@DBA can you double-check that postgresql schema?",
+        [_dba_agent()],
+        speaker_id="dba-1",
+    )
+    assert result.method is DispatchMethod.MENTION
+    assert "dba-1" in result.agent_ids
+
+
 _INVALID_REGEX = r"\b(https?://[\w-]+(\.[\w-]+)+(\/[\w- ./?%&=]*)?)"
 
 
