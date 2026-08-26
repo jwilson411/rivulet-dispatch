@@ -135,3 +135,42 @@ def test_cli_mention_only_roster_unmatched(capsys) -> None:
     payload = json.loads(capsys.readouterr().out)
     assert payload["method"] == "none"
     assert payload["agent_ids"] == []
+
+
+def test_cli_agent_missing_id(capsys, tmp_path) -> None:
+    team = tmp_path / "team.json"
+    team.write_text(
+        json.dumps([{"name": "Assistant", "rules": []}]), encoding="utf-8"
+    )
+    rc = main(["--message", "hello", "--team", str(team)])
+    assert rc == 2
+    captured = capsys.readouterr()
+    lines = [line for line in captured.err.splitlines() if line]
+    assert len(lines) == 1
+    assert lines[0].startswith("error:")
+    assert "Traceback" not in captured.err
+    assert "Traceback" not in captured.out
+
+
+def test_cli_agent_missing_name(capsys, tmp_path) -> None:
+    team = tmp_path / "team.json"
+    team.write_text(
+        json.dumps([{"id": "asst-1", "rules": []}]), encoding="utf-8"
+    )
+    rc = main(["--message", "hello", "--team", str(team)])
+    assert rc == 2
+    captured = capsys.readouterr()
+    lines = [line for line in captured.err.splitlines() if line]
+    assert len(lines) == 1
+    assert lines[0].startswith("error:")
+    assert "Traceback" not in captured.err
+    assert "Traceback" not in captured.out
+
+
+def test_team_schema_file_exists() -> None:
+    schema = json.loads(
+        (ROOT / "examples" / "team.schema.json").read_text(encoding="utf-8")
+    )
+    assert isinstance(schema, dict)
+    assert "$schema" in schema
+    assert schema["type"] == "array"

@@ -17,8 +17,30 @@ from rivulet_dispatch.orchestration import apply_orchestrator_lock
 from rivulet_dispatch.rules import Rule, RuleType
 
 
+def _validate_team(raw: object) -> None:
+    # Required-key walk over the parsed JSON. The full shape is documented
+    # in examples/team.schema.json; this only checks what the loader below
+    # would otherwise KeyError on.
+    if not isinstance(raw, list):
+        raise ValueError("team file must be a JSON array of agents")
+    for i, item in enumerate(raw):
+        if not isinstance(item, dict):
+            raise ValueError(f"agent {i} must be a JSON object")
+        for key in ("id", "name"):
+            value = item.get(key)
+            if not isinstance(value, str) or not value:
+                raise ValueError(f"agent {i} must have a non-empty string {key!r}")
+        rules = item.get("rules", [])
+        if not isinstance(rules, list):
+            raise ValueError(f"agent {i} 'rules' must be an array")
+        for j, rule in enumerate(rules):
+            if not isinstance(rule, dict) or "rule_type" not in rule:
+                raise ValueError(f"agent {i} rule {j} must be an object with 'rule_type'")
+
+
 def _load_team(path: Path) -> list[AgentDispatchInfo]:
     raw = json.loads(path.read_text(encoding="utf-8"))
+    _validate_team(raw)
     agents: list[AgentDispatchInfo] = []
     for item in raw:
         rules = [
@@ -59,6 +81,9 @@ def _run(args: argparse.Namespace) -> int:
         return 2
     except json.JSONDecodeError as exc:
         print(f"error: invalid JSON in team file {args.team}: {exc}", file=sys.stderr)
+        return 2
+    except ValueError as exc:
+        print(f"error: invalid team file {args.team}: {exc}", file=sys.stderr)
         return 2
     result = dispatch_sync(args.message, agents, speaker_id=args.speaker_id)
     if args.orchestrator:

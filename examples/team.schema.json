@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Rivulet Dispatch team file",
+  "description": "A team is a JSON array of agents passed to the CLI via --team.",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": ["id", "name"],
+    "properties": {
+      "id": {
+        "type": "string",
+        "minLength": 1,
+        "description": "Stable agent id returned in dispatch results."
+      },
+      "name": {
+        "type": "string",
+        "minLength": 1,
+        "description": "Display name, also used for @mention matching."
+      },
+      "description": {
+        "type": "string"
+      },
+      "rules": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "required": ["rule_type"],
+          "properties": {
+            "rule_type": {
+              "type": "string",
+              "description": "One of the dispatch rule types, e.g. always, keyword, regex, mention_only."
+            },
+            "pattern": {
+              "oneOf": [
+                {"type": "string"},
+                {"type": "array", "items": {"type": "string"}}
+              ],
+              "description": "Regex source as a string, or a list of keywords for keyword rules."
+            },
+            "priority": {
+              "type": "integer"
+            }
+          },
+          "additionalProperties": true
+        }
+      }
+    },
+    "additionalProperties": true
+  }
+}
