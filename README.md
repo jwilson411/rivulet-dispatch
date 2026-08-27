@@ -10,15 +10,23 @@ Agent *products* are crowded. The failure mode that actually costs money is unso
 
 ## Install
 
-```bash
-pip install rivulet-dispatch
-```
-
-From a clone:
+This package is not on PyPI. Install from a clone (or from git) until a release is published:
 
 ```bash
+git clone https://github.com/jwilson411/rivulet-dispatch.git
+cd rivulet-dispatch
 pip install -e ".[dev]"
 make test
+```
+
+```bash
+pip install "git+https://github.com/jwilson411/rivulet-dispatch.git"
+```
+
+Intended end state, not live yet:
+
+```bash
+# pip install rivulet-dispatch
 ```
 
 ## Dispatch order
